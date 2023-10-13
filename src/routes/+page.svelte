@@ -1,12 +1,14 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
+	import Header from '$lib/Header.svelte';
 	import { pickerController } from 'ionic-svelte';
 
 	import {
 		playOutline,
 		timerOutline,
 		pauseCircleOutline,
-		refreshCircleOutline
+		refreshCircleOutline,
+		playCircleOutline
 	} from 'ionicons/icons';
 
 	// timer settings
@@ -34,9 +36,17 @@
 	}
 
 	function startTimer() {
+		if (interval$) {
+			stopTimer();
+		}
+
 		currentRound = 1;
 		nextStep();
 
+		intervalSetup();
+	}
+
+	function intervalSetup() {
 		interval$ = setInterval(() => {
 			timer--;
 			if (timer < 0) {
@@ -50,7 +60,18 @@
 	}
 
 	function stopTimer() {
+		step = 'settings';
+		setTotalTimer();
 		clearInterval(interval$);
+	}
+
+	function pauseTimer() {
+		clearInterval(interval$);
+		interval$ = null;
+	}
+
+	function resumeTimer() {
+		intervalSetup();
 	}
 
 	function nextStep() {
@@ -99,9 +120,7 @@
 	 * Populate and open the Picker depending on the type
 	 * @param type
 	 */
-	async function populatePicker(type: 'work' | 'rest') {
-		const dateTime = document.querySelector('ion-datetime');
-
+	async function openTimePicker(type: 'work' | 'rest') {
 		const label = type === 'work' ? workLabel : restLabel;
 		const [selectedMinute, selectedSecond] = label.split(':');
 
@@ -139,7 +158,36 @@
 						} else {
 							restTime = value.minutes.value * 60 + value.seconds.value;
 						}
-						timer = (workTime + restTime) * rounds;
+						setTotalTimer();
+					}
+				}
+			]
+		});
+
+		await picker.present();
+	}
+
+	async function openRoundPicker() {
+		const rOptions = roundOptions();
+		const picker = await pickerController.create({
+			columns: [
+				{
+					name: 'rounds',
+					options: rOptions,
+					selectedIndex: rOptions.findIndex((o) => o.value === rounds)
+				}
+			],
+			buttons: [
+				{
+					text: 'Cancel',
+					role: 'cancel'
+				},
+				{
+					text: 'Confirm',
+					handler: (value) => {
+						// update timer settings
+						rounds = value.rounds.value;
+						setTotalTimer();
 					}
 				}
 			]
@@ -175,20 +223,42 @@
 		}
 		return options;
 	}
+
+	/**
+	 * Generate round options between 1 and 20
+	 */
+	function roundOptions() {
+		const options = [];
+		for (let i = 1; i <= 20; i++) {
+			options.push({
+				text: i.toString(),
+				value: i
+			});
+		}
+		return options;
+	}
+
+	function setTotalTimer() {
+		timer = (workTime + restTime) * rounds;
+	}
+
+	function toggleTimer() {
+		interval$ !== null ? pauseTimer() : resumeTimer()
+	}
 </script>
 
 <ion-content>
 	<div class="layout">
-		<div class="timer__header">
-			<div class="timer__number">{timerLabel}</div>
+		<div class="timer__header" class:active={step != 'settings'}>
+			<Header running={interval$ !== null} label={timerLabel} step={step} on:stop={stopTimer} on:toggle={toggleTimer} on:skip={nextStep}  />
 		</div>
-		<div class="timer__content">
+		<div class="timer__content" class:hidden={step != 'settings'}>
 			<Button
 				icon={timerOutline}
 				label="Work"
 				text={workLabel}
 				on:click={() => {
-					populatePicker('work');
+					openTimePicker('work');
 				}}
 			/>
 			<Button
@@ -196,10 +266,15 @@
 				label="Rest"
 				text={restLabel}
 				on:click={() => {
-					populatePicker('rest');
+					openTimePicker('rest');
 				}}
 			/>
-			<Button icon={refreshCircleOutline} label="Rounds" text="3" />
+			<Button
+				icon={refreshCircleOutline}
+				label="Rounds"
+				text={rounds.toString()}
+				on:click={openRoundPicker}
+			/>
 			<Button icon={playOutline} label="Start" on:click={startTimer} />
 		</div>
 	</div>
@@ -209,12 +284,13 @@
 	.layout {
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		height: calc(var(--vh, 1vh) * 100);
 	}
 	.timer__header {
 		flex: 1;
 		display: flex;
-		justify-content: center;
+		flex-direction: column;
+		justify-content: space-between;
 		align-items: center;
 		background-color: #3880ff;
 		color: #fff;
@@ -225,6 +301,13 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		align-items: center;
+		max-height: 80vh;
+		transition: max-height 0.29s ease-out;
+	}
+
+	.hidden {
+		max-height: 0;
+		overflow: hidden;
 	}
 
 	.timer__number {

@@ -1,4 +1,4 @@
-<script lang='ts'>
+<script lang="ts">
 	import { setupIonicBase } from 'ionic-svelte';
 
 	/* Call Ionic's setup routine */
@@ -10,7 +10,17 @@
 	/* Theme variables */
 	import '../theme/variables.css';
 
-	import '../theme/global.css'
+	import '../theme/global.css';
+
+	// We listen to the resize event
+	window.addEventListener('resize', () => {
+		// We execute the same script as before
+		const vh = window.innerHeight * 0.01;
+		document.documentElement.style.setProperty('--vh', `${vh}px`);
+	});
+
+	const vh = window.innerHeight * 0.01;
+	document.documentElement.style.setProperty('--vh', `${vh}px`);
 
 	/*
 		This part - import 'ionic-svelte/components/all'; -  loads all components at once.
