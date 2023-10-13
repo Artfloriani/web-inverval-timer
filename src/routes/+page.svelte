@@ -87,7 +87,7 @@
 		}
 
 		if (timer <= 3 && timer > 0) {
-			(<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
+			// (<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
 		} else if (timer === 0) {
 			if (step === 'work') {
 				(<HTMLAudioElement>document.getElementById('rest-audio')).play();
