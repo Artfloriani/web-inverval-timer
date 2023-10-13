@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
 	import Header from '$lib/Header.svelte';
+	import { getMinutesPickerOptions, getRoundsPickerOptions, getSecondsPickerOptions, secondsToHHmm } from '$lib/utils';
 	import { pickerController } from 'ionic-svelte';
 
 	import {
@@ -25,6 +26,8 @@
 	let restAudio: HTMLAudioElement;
 	let halfAudio: HTMLAudioElement;
 
+	let wakeLock: WakeLockSentinel | null = null;
+
 	// labels for timer settings
 	let workLabel = '3:00';
 	let restLabel = '1:00';
@@ -32,7 +35,7 @@
 
 	// running timer values
 	let currentRound = 1;
-	let step: 'settings' | 'pre' | 'work' | 'rest' | 'finished' = 'settings';
+	let step: 'settings' | 'pre' | 'work' | 'rest'  = 'settings';
 	let progress = 0;
 
 	$: {
@@ -45,20 +48,24 @@
 		progress = (totalTime - timer) / totalTime;
 	}
 
-	onMount(() => {
-		keepAwake();
-	});
-
-	async function keepAwake() {
-		try {
-			const wakeLock = await navigator.wakeLock.request('screen');
-		} catch (err: any) {
-			// the wake lock request fails - usually system related, such being low on battery
-			console.log(`${err.name}, ${err.message}`);
-		}
-	}
 
 	function startTimer() {
+		// loading here as this was triggered by a click event
+		loadAudioFiles();
+
+		keepAwake();
+
+		if (interval$) {
+			stopTimer();
+		}
+
+		currentRound = 1;
+		nextStep();
+
+		startInterval();
+	}
+
+	function loadAudioFiles() {
 		if (!startAudio) {
 			startAudio = new Audio('start.mp3');
 			restAudio = new Audio('rest.mp3');
@@ -68,17 +75,9 @@
 			restAudio.preload = 'auto';
 			halfAudio.preload = 'auto';
 		}
-		if (interval$) {
-			stopTimer();
-		}
-
-		currentRound = 1;
-		nextStep();
-
-		intervalSetup();
 	}
 
-	function intervalSetup() {
+	function startInterval() {
 		interval$ = setInterval(() => {
 			timer--;
 			if (timer < 0) {
@@ -86,10 +85,6 @@
 			}
 
 			audioCheck();
-
-			if (step === 'finished') {
-				stopTimer();
-			}
 		}, 1000);
 	}
 
@@ -126,7 +121,7 @@
 	}
 
 	function resumeTimer() {
-		intervalSetup();
+		startInterval();
 	}
 
 	function nextStep() {
@@ -155,25 +150,13 @@
 					break;
 				}
 
-				step = 'finished';
+				step = 'settings';
 				stopTimer();
 				break;
-			case 'finished':
+			default:
 				step = 'settings';
 				break;
 		}
-	}
-
-	/**
-	 * convert a seconds number into a "mm:ss" string
-	 * @param seconds
-	 */
-	function secondsToHHmm(seconds: number) {
-		let m: string | number = Math.floor(seconds / 60);
-		let s: string | number = seconds - m * 60;
-		if (s < 10) s = '0' + s;
-		if (m < 10) m = '0' + m;
-		return `${m}:${s}`;
 	}
 
 	/**
@@ -184,8 +167,8 @@
 		const label = type === 'work' ? workLabel : restLabel;
 		const [selectedMinute, selectedSecond] = label.split(':');
 
-		const mOptions = minuteOptions();
-		const sOptions = secondOptions();
+		const mOptions = getMinutesPickerOptions();
+		const sOptions = getSecondsPickerOptions();
 
 		const picker = await pickerController.create({
 			columns: [
@@ -228,7 +211,7 @@
 	}
 
 	async function openRoundPicker() {
-		const rOptions = roundOptions();
+		const rOptions = getRoundsPickerOptions();
 		const picker = await pickerController.create({
 			columns: [
 				{
@@ -256,79 +239,26 @@
 		await picker.present();
 	}
 
-	/**
-	 * Generate picker options for minutes, from 0 to 30
-	 */
-	function minuteOptions() {
-		const options = [];
-		for (let i = 0; i <= 30; i++) {
-			options.push({
-				text: i < 10 ? `0${i}` : i.toString(),
-				value: i
-			});
-		}
-		return options;
-	}
-
-	/**
-	 * Generate picker options for seconds from 0 to 55, by 5
-	 */
-	function secondOptions() {
-		const options = [];
-		for (let i = 0; i < 60; i += 5) {
-			options.push({
-				text: i < 10 ? `0${i}` : i.toString(),
-				value: i
-			});
-		}
-		return options;
-	}
-
-	/**
-	 * Generate round options between 1 and 20
-	 */
-	function roundOptions() {
-		const options = [];
-		for (let i = 1; i <= 20; i++) {
-			options.push({
-				text: i.toString(),
-				value: i
-			});
-		}
-		return options;
-	}
-
 	function setTotalTimer() {
-		timer = (workTime + restTime) * rounds;
+		timer = (workTime + restTime) * rounds - restTime;
 	}
 
 	function toggleTimer() {
 		interval$ !== null ? pauseTimer() : resumeTimer();
 	}
+
+	async function keepAwake() {
+		if (wakeLock != null) {
+			return;
+		}
+
+		try {
+			wakeLock = await navigator.wakeLock.request('screen');
+		} catch (err: any) {
+			console.log(`${err.name}, ${err.message}`);
+		}
+	}
 </script>
-
-<!-- <audio id="3-audio" preload="auto" autoplay={false}>
-	<source src="3.mp3" type="audio/mpeg" />
-</audio>
-
-<audio id="2-audio" preload="auto" autoplay={false}>
-	<source src="2.mp3" type="audio/mpeg" />
-</audio>
-<audio id="1-audio" preload="auto" autoplay={false}>
-	<source src="1.mp3" type="audio/mpeg" />
-</audio>
- -->
-<!-- <audio id="rest-audio" preload="auto" autoplay={false}>
-	<source src="rest.mp3" type="audio/mpeg" />
-</audio>
-
-<audio id="start-audio" preload="auto" autoplay={false}>
-	<source src="start.mp3" type="audio/mpeg" />
-</audio>
-
-<audio id="half-audio" preload="auto" autoplay={false}>
-	<source src="half.mp3" type="audio/mpeg" />
-</audio> -->
 
 <ion-content>
 	<div slot="fixed" class="timer__volume">
