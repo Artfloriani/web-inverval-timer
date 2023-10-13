@@ -27,12 +27,16 @@
 	// running timer values
 	let currentRound = 1;
 	let step: 'settings' | 'pre' | 'work' | 'rest' | 'finished' = 'settings';
+	let progress = 0;
 
 	$: {
 		//convert seconds to "mm:ss" format
 		workLabel = secondsToHHmm(workTime);
 		restLabel = secondsToHHmm(restTime);
 		timerLabel = secondsToHHmm(timer);
+
+		const totalTime = step === 'work' ? workTime : restTime;
+		progress = (totalTime - timer) / totalTime;
 	}
 
 	function startTimer() {
@@ -302,6 +306,8 @@
 				running={interval$ !== null}
 				label={timerLabel}
 				{step}
+				round={currentRound}
+				{progress}
 				on:stop={stopTimer}
 				on:toggle={toggleTimer}
 				on:skip={nextStep}

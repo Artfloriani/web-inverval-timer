@@ -5,6 +5,8 @@
     export let step: string;
     export let label: string;
     export let running: boolean;
+    export let round: number = 1;
+    export let progress = 0;
 
     import { createEventDispatcher } from 'svelte';
 
@@ -23,8 +25,12 @@
 </script>
 
 
-<div class="header__spacing"></div>
-<div>
+<div class="header__spacing">
+    {#if step !== "settings"} 
+        <div class="header__label animate">Round {round}</div>
+    {/if}
+</div>
+<div class="header__content">
     {#if step === 'pre'}
         <div class="header__description">Get Ready</div>
     {:else if step === 'work'}
@@ -37,6 +43,10 @@
         <div class="header__description">Total Time</div>
     {/if}
     <div class="header__number">{label}</div>
+
+    {#if step === 'work' || step === 'rest'}
+        <ion-progress-bar value={progress}></ion-progress-bar>
+    {/if}
 </div>
 
 <div class="header__buttons" class:animate={step!== 'settings'}>
@@ -72,6 +82,22 @@
         max-height: 0;
     }
 
+    .header__spacing{
+        padding: 20px;
+    }
+
+    .header__label {
+        font-weight: bold;
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    .header__content {
+        width: 100%;
+        text-align: center;
+        padding: 30px;
+    }
+
     .animate {
         animation: slide-up 0.5s;
         animation-delay: 0.2s;
@@ -91,16 +117,6 @@
             transform: translateY(0);
         }
     }
-    .header__description {
-        font-size: 1.2rem;
-
-    }
-
-    .header__number {
-        font-size: 6rem;
-        font-weight: 700;
-        
-    }
 
     .header__number,
     .header__description {
@@ -108,5 +124,16 @@
         margin: 0.5rem 0;
         color: #000000DE;
     }
+
+    .header__description {
+        font-size: 1.2rem;
+    }
+
+    .header__number {
+        font-size: 6rem;
+        font-weight: 700;    
+        margin-bottom: 40px;    
+    }
+
 </style>
 
