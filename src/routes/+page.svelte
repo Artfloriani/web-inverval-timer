@@ -295,7 +295,7 @@
 	}
 </script>
 
-<audio id="3-audio" preload="auto" autoplay={false}>
+<!-- <audio id="3-audio" preload="auto" autoplay={false}>
 	<source src="3.mp3" type="audio/mpeg" />
 </audio>
 
@@ -305,7 +305,7 @@
 <audio id="1-audio" preload="auto" autoplay={false}>
 	<source src="1.mp3" type="audio/mpeg" />
 </audio>
-
+ -->
 <audio id="rest-audio" preload="auto" autoplay={false}>
 	<source src="rest.mp3" type="audio/mpeg" />
 </audio>
