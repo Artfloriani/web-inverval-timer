@@ -8,8 +8,10 @@
 		timerOutline,
 		pauseCircleOutline,
 		refreshCircleOutline,
-		playCircleOutline
+		volumeMuteOutline,
+		volumeHighOutline
 	} from 'ionicons/icons';
+	import { onMount } from 'svelte';
 
 	// timer settings
 	let preTime = 5;
@@ -18,6 +20,7 @@
 	let rounds = 3;
 	let timer = (workTime + restTime) * rounds;
 	let interval$: any;
+	let playAudio = true;
 
 	// labels for timer settings
 	let workLabel = '3:00';
@@ -37,6 +40,19 @@
 
 		const totalTime = step === 'work' ? workTime : restTime;
 		progress = (totalTime - timer) / totalTime;
+	}
+
+	onMount(() => {
+		keepAwake();
+	});
+
+	async function keepAwake() {
+		try {
+			const wakeLock = await navigator.wakeLock.request('screen');
+		} catch (err: any) {
+			// the wake lock request fails - usually system related, such being low on battery
+			console.log(`${err.name}, ${err.message}`);
+		}
 	}
 
 	function startTimer() {
@@ -66,6 +82,10 @@
 	}
 
 	function audioCheck() {
+		if (!playAudio) {
+			return;
+		}
+
 		if (timer <= 3 && timer > 0) {
 			(<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
 		} else if (timer === 0) {
@@ -74,7 +94,7 @@
 			} else if ((step === 'rest' || step === 'pre') && currentRound <= rounds) {
 				(<HTMLAudioElement>document.getElementById('start-audio')).play();
 			}
-		} else if(step === 'work'){
+		} else if (step === 'work') {
 			const halfWay = Math.round(workTime / 2);
 			if (timer === halfWay) {
 				(<HTMLAudioElement>document.getElementById('half-audio')).play();
@@ -298,8 +318,14 @@
 	<source src="half.mp3" type="audio/mpeg" />
 </audio>
 
-
 <ion-content>
+	<div slot="fixed" class="timer__volume">
+		<Button
+			transparent
+			icon={playAudio ? volumeHighOutline : volumeMuteOutline}
+			on:click={() => (playAudio = !playAudio)}
+		/>
+	</div>
 	<div class="layout">
 		<div class="timer__header {step}" class:active={step != 'settings'}>
 			<Header
@@ -394,5 +420,9 @@
 	.timer__number {
 		font-size: 3rem;
 		font-weight: bold;
+	}
+
+	.timer__volume {
+		right: 0;
 	}
 </style>
