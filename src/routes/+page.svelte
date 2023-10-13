@@ -67,8 +67,13 @@
 		} else if (timer === 0) {
 			if (step === 'work') {
 				(<HTMLAudioElement>document.getElementById('rest-audio')).play();
-			} else if ((step === 'rest' || step === 'pre') && currentRound < rounds) {
+			} else if ((step === 'rest' || step === 'pre') && currentRound <= rounds) {
 				(<HTMLAudioElement>document.getElementById('start-audio')).play();
+			}
+		} else if(step === 'work'){
+			const halfWay = Math.round(workTime / 2);
+			if (timer === halfWay) {
+				(<HTMLAudioElement>document.getElementById('half-audio')).play();
 			}
 		}
 	}
@@ -99,8 +104,13 @@
 				step = 'work';
 				break;
 			case 'work':
+				if (currentRound === rounds) {
+					stopTimer();
+					break;
+				}
 				timer = restTime;
 				step = 'rest';
+
 				break;
 			case 'rest':
 				if (currentRound++ < rounds) {
@@ -279,6 +289,11 @@
 <audio id="start-audio" preload="auto" autoplay={false}>
 	<source src="start.mp3" type="audio/mpeg" />
 </audio>
+
+<audio id="half-audio" preload="auto" autoplay={false}>
+	<source src="half.mp3" type="audio/mpeg" />
+</audio>
+
 
 <ion-content>
 	<div class="layout">
