@@ -10,6 +10,8 @@
 	/* Theme variables */
 	import '../theme/variables.css';
 
+	import '../theme/global.css'
+
 	/*
 		This part - import 'ionic-svelte/components/all'; -  loads all components at once.
 

@@ -2,6 +2,7 @@
     export let icon :string;
     export let label: string;
     export let text : string = '';
+    export let id: string = '';
 
 
  import { createEventDispatcher } from 'svelte'
@@ -9,12 +10,12 @@
   const dispatch = createEventDispatcher()
 </script>
 
-<ion-button class="button" on:click={() => {
+<ion-button class="button" id={id} on:click={() => {
      dispatch('click')
 }}>
     <ion-icon src={icon} class="icon"></ion-icon>
     <span class="text">{label}</span>
-    <span class="additional-text">{text}</span>
+<span class="additional-text">{text}</span>
 </ion-button>
 
 <style>
