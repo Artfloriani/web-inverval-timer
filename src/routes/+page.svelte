@@ -4,12 +4,13 @@
 	import {playOutline, timerOutline, pauseCircleOutline, refreshCircleOutline} from "ionicons/icons";
 
 
-
 	// timer settings
-	let workTime = 180;
-	let restTime = 60;
+	let preTime = 10;
+	let workTime = 15;
+	let restTime = 5;
 	let rounds = 3;
 	let timer = (workTime + restTime) * rounds;
+	let interval$:any;
 	
 	// labels for timer settings
 	let workLabel = "3:00";
@@ -17,7 +18,7 @@
 	let timerLabel = '4:00';
 
 	// running timer values
-	let currentRound = 0;
+	let currentRound = 1;
 	let step : 'settings' | 'pre' | 'work' | 'rest' | 'finished' = 'settings';
 
 	$: {
@@ -28,15 +29,62 @@
 	}
 
 	function startTimer() {
-		setInterval(() => {
+		currentRound = 1;
+		nextStep();
+
+		interval$ = setInterval(() => {
 			timer--;
-		}, 1000);
+			if (timer < 0) {
+				nextStep();
+			}
+
+			if (step === 'finished') {
+				stopTimer();
+			}
+		}, 1000)
+	}
+
+	function stopTimer() {
+		clearInterval(interval$);
+	}
+
+
+	function nextStep() {
+		switch (step) {
+			case 'settings':
+				timer = preTime;
+				step = 'pre';
+				break;
+			case 'pre':
+				timer = workTime;
+				step = 'work';
+				break;
+			case 'work':
+				timer = restTime;
+				step = 'rest';
+				break;
+			case 'rest':
+				if (currentRound++ < rounds) {
+					timer = workTime;
+					step = 'work';
+					break;
+				}
+
+				step = 'finished';
+				timer = 0;
+				break;
+			case 'finished':
+				step = 'settings';
+				break;
+		}
 	}
 
 	function secondsToHHmm(seconds: number)  {
-		let m = Math.floor(seconds / 60);
-		let s = seconds - m * 60;
-		return s < 10 ? `${m}:0${s}`:`${m}:${s}`;
+		let m :string | number = Math.floor(seconds / 60);
+		let s :string | number = seconds - m * 60;
+		if (s < 10) s = '0' + s;
+		if (m < 10) m = '0' + m;
+		return `${m}:${s}`;
 	}
 
 </script>
@@ -85,7 +133,4 @@
 		font-weight: bold;
 	}
 
-	.number {
-		float: right;
-	}
 </style>
