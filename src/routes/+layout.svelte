@@ -5,7 +5,13 @@
 	setupIonicBase();
 
 	/* Import all components - or do partial loading - see below */
-	import 'ionic-svelte/components/all';
+	/* import 'ionic-svelte/components/all'; */
+
+	import 'ionic-svelte/components/ion-app';
+	import 'ionic-svelte/components/ion-content';
+	import 'ionic-svelte/components/ion-progress-bar';
+	import 'ionic-svelte/components/ion-picker';
+	import 'ionic-svelte/components/ion-button';
 
 	/* Theme variables */
 	import '../theme/variables.css';
