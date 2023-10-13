@@ -96,7 +96,7 @@
 				}
 
 				step = 'finished';
-				timer = 0;
+				stopTimer();
 				break;
 			case 'finished':
 				step = 'settings';
@@ -243,20 +243,28 @@
 	}
 
 	function toggleTimer() {
-		interval$ !== null ? pauseTimer() : resumeTimer()
+		interval$ !== null ? pauseTimer() : resumeTimer();
 	}
 </script>
 
 <ion-content>
 	<div class="layout">
-		<div class="timer__header" class:active={step != 'settings'}>
-			<Header running={interval$ !== null} label={timerLabel} step={step} on:stop={stopTimer} on:toggle={toggleTimer} on:skip={nextStep}  />
+		<div class="timer__header {step}" class:active={step != 'settings'}>
+			<Header
+				running={interval$ !== null}
+				label={timerLabel}
+				{step}
+				on:stop={stopTimer}
+				on:toggle={toggleTimer}
+				on:skip={nextStep}
+			/>
 		</div>
 		<div class="timer__content" class:hidden={step != 'settings'}>
 			<Button
 				icon={timerOutline}
 				label="Work"
 				text={workLabel}
+				color="secondary"
 				on:click={() => {
 					openTimePicker('work');
 				}}
@@ -265,6 +273,7 @@
 				icon={pauseCircleOutline}
 				label="Rest"
 				text={restLabel}
+				color="tertiary"
 				on:click={() => {
 					openTimePicker('rest');
 				}}
@@ -272,15 +281,20 @@
 			<Button
 				icon={refreshCircleOutline}
 				label="Rounds"
+				color="medium"
 				text={rounds.toString()}
 				on:click={openRoundPicker}
 			/>
-			<Button icon={playOutline} label="Start" on:click={startTimer} />
+			<Button icon={playOutline} color="light" label="Start" size="footer" on:click={startTimer} />
 		</div>
 	</div>
 </ion-content>
 
 <style>
+
+	ion-content {
+		--background: var(--ion-color-light-tint);
+	}
 	.layout {
 		display: flex;
 		flex-direction: column;
@@ -292,8 +306,21 @@
 		flex-direction: column;
 		justify-content: space-between;
 		align-items: center;
-		background-color: #3880ff;
-		color: #fff;
+		background-color: var(--ion-color-light);
+
+		transition: background-color 0.29s cubic-bezier(0.3, 0, 1, 1);
+	}
+
+	.pre {
+		background-color: var(--ion-color-light);
+	}
+
+	.work {
+		background-color:  var(--ion-color-secondary)
+	}
+
+	.rest {
+		background-color: var(--ion-color-tertiary)
 	}
 
 	.timer__content {
@@ -301,8 +328,9 @@
 		flex-direction: column;
 		justify-content: flex-end;
 		align-items: center;
-		max-height: 80vh;
-		transition: max-height 0.29s ease-out;
+		max-height: calc(var(--vh, 80vh) * 100);
+		transition: max-height 0.29s;
+		transition-timing-function: cubic-bezier(0.3, 0, 1, 1);
 	}
 
 	.hidden {

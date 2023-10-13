@@ -23,7 +23,7 @@
 </script>
 
 
-<div></div>
+<div class="header__spacing"></div>
 <div>
     {#if step === 'pre'}
         <div class="header__description">Get Ready</div>
@@ -39,19 +39,20 @@
     <div class="header__number">{label}</div>
 </div>
 
-<div class="header__buttons">
+<div class="header__buttons" class:animate={step!== 'settings'}>
 {#if step !== 'settings'}
-	<Button align="center" size="medium" icon={closeCircleOutline} on:click={stopTimer} />
+	<Button align="center" size="medium" transparent icon={closeCircleOutline} on:click={stopTimer} />
 	<Button
         align="center"
         size="large"
 		icon={running ? pauseCircleOutline : playCircleOutline}
-		label=""
+        transparent
 		on:click={toggleTimer}
 	/>
     <Button
         align="center"
         size="medium"
+        transparent
 		icon={playForwardCircleOutline}
 		on:click={skip}
 	/>
@@ -65,8 +66,30 @@
         display: flex;
         align-items: flex-end;
         width: 100%;
-        min-height: 50px;
 
+        opacity: 0;
+        transform: translateY(100%);
+        max-height: 0;
+    }
+
+    .animate {
+        animation: slide-up 0.5s;
+        animation-delay: 0.2s;
+        animation-fill-mode: forwards;
+        animation-timing-function: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+    }
+
+    @keyframes slide-up {
+        from {
+            max-height: 0;
+            opacity: 0;
+            transform: translateY(100%);
+        }
+        to {
+            max-height: 10rem;
+            opacity: 1;
+            transform: translateY(0);
+        }
     }
     .header__description {
         font-size: 1.2rem;

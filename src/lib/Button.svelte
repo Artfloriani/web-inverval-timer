@@ -2,8 +2,10 @@
 	export let icon: string = '';
 	export let label: string = '';
 	export let text: string = '';
+    export let transparent = false;
     export let align : 'auto' | 'center' = 'auto'
-    export let size: 'default' | 'large' | 'medium' = 'default'
+    export let size: 'default' | 'large' | 'medium' | 'footer' = 'default'
+    export let color = '';
 
 	import { createEventDispatcher } from 'svelte';
 
@@ -15,6 +17,9 @@
     class:align-center={align === 'center'}
     class:large={size === 'large'}
     class:medium={size === 'medium'}
+    class:footer={size === 'footer'}
+    class:transparent={transparent}
+    color={color}
 	on:click={() => {
 		dispatch('click');
 	}}
@@ -35,12 +40,38 @@
 		width: 100%;
 		display: flex;
 		align-items: center;
-		padding: 0.5rem;
+        margin: 0px;
+
 		border: none;
 
-		color: #fff;
-		font-size: 1rem;
+		font-size: 18px;
+
+        --box-shadow:none;
+        --border-radius: 8px;
+        --padding-top: 20px;
+        --padding-bottom: 20px;
+        --padding-start: 20px;
+        --padding-end: 20px;
 	}
+
+    .footer {
+        justify-content: center;
+        width: auto;
+        min-height: 2.5rem;
+
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .footer .label {
+        margin: 0;
+    }
+
+    .transparent {
+        --background: transparent !important;
+        --background-activated: transparent !important;
+        --color: var(--ion-color-primary)
+    }
 
     .large {
         font-size: 5rem;
