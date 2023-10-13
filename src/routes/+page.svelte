@@ -268,8 +268,8 @@
 			on:click={() => (playAudio = !playAudio)}
 		/>
 	</div>
-	<div class="layout">
-		<div class="timer__header {step}" class:active={step != 'settings'}>
+	<div class="timer__layout">
+		<div class="timer__header timer__header--{step}" class:active={step != 'settings'}>
 			<Header
 				running={interval$ !== null}
 				label={timerLabel}
@@ -316,11 +316,13 @@
 	ion-content {
 		--background: var(--ion-color-light);
 	}
-	.layout {
+
+	.timer__layout {
 		display: flex;
 		flex-direction: column;
 		height: calc(var(--vh, 1vh) * 100);
 	}
+
 	.timer__header {
 		flex: 1;
 		display: flex;
@@ -332,15 +334,15 @@
 		transition: background-color 0.29s cubic-bezier(0.3, 0, 1, 1);
 	}
 
-	.pre {
+	.timer__header--pre {
 		background-color: var(--ion-color-light);
 	}
 
-	.work {
+	.timer__header--work {
 		background-color: var(--ion-color-secondary);
 	}
 
-	.rest {
+	.timer__header--rest {
 		background-color: var(--ion-color-tertiary);
 	}
 
