@@ -30,7 +30,6 @@
 		//convert seconds to "mm:ss" format
 		workLabel = secondsToHHmm(workTime);
 		restLabel = secondsToHHmm(restTime);
-		timer = (workTime + restTime) * rounds;
 		timerLabel = secondsToHHmm(timer);
 	}
 
@@ -140,6 +139,7 @@
 						} else {
 							restTime = value.minutes.value * 60 + value.seconds.value;
 						}
+						timer = (workTime + restTime) * rounds;
 					}
 				}
 			]
