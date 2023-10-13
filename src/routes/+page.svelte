@@ -21,6 +21,9 @@
 	let timer = (workTime + restTime) * rounds;
 	let interval$: any;
 	let playAudio = true;
+	let startAudio : HTMLAudioElement;
+	let restAudio: HTMLAudioElement;
+	let halfAudio: HTMLAudioElement;
 
 	// labels for timer settings
 	let workLabel = '3:00';
@@ -56,6 +59,15 @@
 	}
 
 	function startTimer() {
+		if (!startAudio) {
+			startAudio = new Audio('start.mp3');
+			restAudio = new Audio('rest.mp3');
+			halfAudio = new Audio('half.mp3');
+
+			startAudio.preload = 'auto';
+			restAudio.preload = 'auto';
+			halfAudio.preload = 'auto';
+		}
 		if (interval$) {
 			stopTimer();
 		}
@@ -90,14 +102,14 @@
 			// (<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
 		} else if (timer === 0) {
 			if (step === 'work') {
-				(<HTMLAudioElement>document.getElementById('rest-audio')).play();
+				restAudio.play();
 			} else if ((step === 'rest' || step === 'pre') && currentRound <= rounds) {
-				(<HTMLAudioElement>document.getElementById('start-audio')).play();
+				startAudio.play();
 			}
 		} else if (step === 'work') {
 			const halfWay = Math.round(workTime / 2);
 			if (timer === halfWay) {
-				(<HTMLAudioElement>document.getElementById('half-audio')).play();
+				halfAudio.play();
 			}
 		}
 	}
@@ -306,7 +318,7 @@
 	<source src="1.mp3" type="audio/mpeg" />
 </audio>
  -->
-<audio id="rest-audio" preload="auto" autoplay={false}>
+<!-- <audio id="rest-audio" preload="auto" autoplay={false}>
 	<source src="rest.mp3" type="audio/mpeg" />
 </audio>
 
@@ -316,7 +328,7 @@
 
 <audio id="half-audio" preload="auto" autoplay={false}>
 	<source src="half.mp3" type="audio/mpeg" />
-</audio>
+</audio> -->
 
 <ion-content>
 	<div slot="fixed" class="timer__volume">
