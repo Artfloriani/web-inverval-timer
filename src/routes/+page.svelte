@@ -14,10 +14,10 @@
 	import { onMount } from 'svelte';
 
 	// timer settings
-	let preTime = 5;
-	let workTime = 15;
-	let restTime = 5;
-	let rounds = 3;
+	let preTime = 10;
+	let workTime = 180;
+	let restTime = 60;
+	let rounds = 5;
 	let timer = (workTime + restTime) * rounds;
 	let interval$: any;
 	let playAudio = true;
@@ -372,7 +372,7 @@
 
 <style>
 	ion-content {
-		--background: var(--ion-color-light-tint);
+		--background: var(--ion-color-light);
 	}
 	.layout {
 		display: flex;

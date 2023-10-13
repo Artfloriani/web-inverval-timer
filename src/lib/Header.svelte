@@ -24,7 +24,6 @@
     }
 </script>
 
-
 <div class="header__spacing">
     {#if step !== "settings"} 
         <div class="header__label animate">Round {round}</div>
