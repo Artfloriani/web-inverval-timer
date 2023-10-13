@@ -70,7 +70,7 @@
     .transparent {
         --background: transparent !important;
         --background-activated: transparent !important;
-        --color: var(--ion-color-primary)
+        --color: #000000DE;
     }
 
     .large {

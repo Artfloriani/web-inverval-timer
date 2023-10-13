@@ -12,7 +12,7 @@
 	} from 'ionicons/icons';
 
 	// timer settings
-	let preTime = 10;
+	let preTime = 5;
 	let workTime = 15;
 	let restTime = 5;
 	let rounds = 3;
@@ -53,10 +53,24 @@
 				nextStep();
 			}
 
+			audioCheck();
+
 			if (step === 'finished') {
 				stopTimer();
 			}
 		}, 1000);
+	}
+
+	function audioCheck() {
+		if (timer <= 3 && timer > 0) {
+			(<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
+		} else if (timer === 0) {
+			if (step === 'work') {
+				(<HTMLAudioElement>document.getElementById('rest-audio')).play();
+			} else if ((step === 'rest' || step === 'pre') && currentRound < rounds) {
+				(<HTMLAudioElement>document.getElementById('start-audio')).play();
+			}
+		}
 	}
 
 	function stopTimer() {
@@ -247,6 +261,25 @@
 	}
 </script>
 
+<audio id="3-audio" preload="auto" autoplay={false}>
+	<source src="3.mp3" type="audio/mpeg" />
+</audio>
+
+<audio id="2-audio" preload="auto" autoplay={false}>
+	<source src="2.mp3" type="audio/mpeg" />
+</audio>
+<audio id="1-audio" preload="auto" autoplay={false}>
+	<source src="1.mp3" type="audio/mpeg" />
+</audio>
+
+<audio id="rest-audio" preload="auto" autoplay={false}>
+	<source src="rest.mp3" type="audio/mpeg" />
+</audio>
+
+<audio id="start-audio" preload="auto" autoplay={false}>
+	<source src="start.mp3" type="audio/mpeg" />
+</audio>
+
 <ion-content>
 	<div class="layout">
 		<div class="timer__header {step}" class:active={step != 'settings'}>
@@ -291,7 +324,6 @@
 </ion-content>
 
 <style>
-
 	ion-content {
 		--background: var(--ion-color-light-tint);
 	}
@@ -316,11 +348,11 @@
 	}
 
 	.work {
-		background-color:  var(--ion-color-secondary)
+		background-color: var(--ion-color-secondary);
 	}
 
 	.rest {
-		background-color: var(--ion-color-tertiary)
+		background-color: var(--ion-color-tertiary);
 	}
 
 	.timer__content {

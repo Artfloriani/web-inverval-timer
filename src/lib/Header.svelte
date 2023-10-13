@@ -99,12 +99,14 @@
     .header__number {
         font-size: 6rem;
         font-weight: 700;
+        
     }
 
     .header__number,
     .header__description {
         text-align: center;
         margin: 0.5rem 0;
+        color: #000000DE;
     }
 </style>
 
