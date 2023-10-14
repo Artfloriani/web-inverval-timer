@@ -7,6 +7,7 @@ export default defineConfig({
 	plugins: [
 		sveltekit(),
 		VitePWA({
+			injectRegister: 'inline',
 			registerType: 'autoUpdate',
 			workbox: {
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3}']
@@ -27,6 +28,18 @@ export default defineConfig({
 						src: '512.png',
 						sizes: '512x512',
 						type: 'image/png'
+					},
+					{
+						src: '512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'any'
+					},
+					{
+						src: '512.png',
+						sizes: '512x512',
+						type: 'image/png',
+						purpose: 'maskable'
 					}
 				]
 			}
