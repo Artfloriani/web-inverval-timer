@@ -23,24 +23,13 @@ const config = {
 						src: '192.png',
 						sizes: '192x192',
 						type: 'image/png',
-						purpose: 'any'
-					},
-					{
-						src: '512.png',
-						sizes: '512x512',
-						type: 'image/png'
+						purpose: 'maskable any'
 					},
 					{
 						src: '512.png',
 						sizes: '512x512',
 						type: 'image/png',
-						purpose: 'any'
-					},
-					{
-						src: '512.png',
-						sizes: '512x512',
-						type: 'image/png',
-						purpose: 'maskable'
+						purpose: 'maskable any'
 					}
 				]
 			}
