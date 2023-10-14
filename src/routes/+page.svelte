@@ -12,13 +12,12 @@
 		volumeMuteOutline,
 		volumeHighOutline
 	} from 'ionicons/icons';
-	import { onMount } from 'svelte';
 
 	// timer settings
 	let preTime = 10;
 	let workTime = 180;
 	let restTime = 60;
-	let rounds = 5;
+	let rounds = 6;
 	let timer = (workTime + restTime) * rounds;
 	let interval$: any;
 	let playAudio = true;
