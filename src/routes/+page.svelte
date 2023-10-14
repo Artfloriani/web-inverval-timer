@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Button from '$lib/Button.svelte';
 	import Header from '$lib/Header.svelte';
+	import { initAudioBuffers, playSourceAudio } from '$lib/audio';
 	import { getMinutesPickerOptions, getRoundsPickerOptions, getSecondsPickerOptions, secondsToHHmm } from '$lib/utils';
 	import { pickerController } from 'ionic-svelte';
 
@@ -21,9 +22,6 @@
 	let timer = (workTime + restTime) * rounds;
 	let interval$: any;
 	let playAudio = true;
-	let startAudio : HTMLAudioElement;
-	let restAudio: HTMLAudioElement;
-	let halfAudio: HTMLAudioElement;
 
 	let wakeLock: WakeLockSentinel | null = null;
 
@@ -49,9 +47,7 @@
 
 
 	function startTimer() {
-		// loading here as this was triggered by a click event
 		loadAudioFiles();
-
 		keepAwake();
 
 		if (interval$) {
@@ -65,15 +61,7 @@
 	}
 
 	function loadAudioFiles() {
-		if (!startAudio) {
-			startAudio = new Audio('start.mp3');
-			restAudio = new Audio('rest.mp3');
-			halfAudio = new Audio('half.mp3');
-
-			startAudio.preload = 'auto';
-			restAudio.preload = 'auto';
-			halfAudio.preload = 'auto';
-		}
+		initAudioBuffers();
 	}
 
 	function startInterval() {
@@ -96,14 +84,15 @@
 			// (<HTMLAudioElement>document.getElementById(`${timer}-audio`)).play();
 		} else if (timer === 0) {
 			if (step === 'work') {
-				restAudio.play();
+					playSourceAudio('rest')
+					
 			} else if ((step === 'rest' || step === 'pre') && currentRound <= rounds) {
-				startAudio.play();
+					playSourceAudio('start');
 			}
 		} else if (step === 'work') {
 			const halfWay = Math.round(workTime / 2);
 			if (timer === halfWay) {
-				halfAudio.play();
+					playSourceAudio('half');
 			}
 		}
 	}
