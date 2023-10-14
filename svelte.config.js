@@ -7,6 +7,9 @@ const config = {
 	preprocess: preprocess(),
 
 	kit: {
+		serviceWorker: {
+			register: false
+		},
 		adapter: adapter({
 			pages: 'build',
 			assets: 'build',

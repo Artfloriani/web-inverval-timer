@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { setupIonicBase } from 'ionic-svelte';
+	import { dev } from '$app/environment';
+	import { preloadCode } from '$app/navigation';
 
 	/* Call Ionic's setup routine */
 	setupIonicBase();
@@ -17,6 +19,10 @@
 	import '../theme/variables.css';
 
 	import '../theme/global.css';
+	import { pwaStatusStream, type PWAStatus } from '$lib/pwa';
+
+	// Prefetch all code when not in dev
+	if (!dev) preloadCode();
 
 	// We listen to the resize event
 	window.addEventListener('resize', () => {
@@ -59,7 +65,27 @@
 		Want to know what is happening more - follow me on Twitter - https://twitter.com/Tommertomm
 		Discord channel on Ionic server - https://discordapp.com/channels/520266681499779082/1049388501629681675
 	*/
+
+	pwaStatusStream.subscribe((status: PWAStatus) => {
+		console.log('PWA status', status);
+
+		if (status.updateFunction) {
+			console.log('PWA updating itself in 4 secs......');
+			setTimeout(() => {
+				status.updateFunction();
+			}, 4000);
+		}
+	});
+
+	// Aggressive prefetching for faster rendering
+	if (!dev) {
+		preloadCode();
+	}
+
+
 </script>
+
+
 
 <ion-app>
 	<slot />

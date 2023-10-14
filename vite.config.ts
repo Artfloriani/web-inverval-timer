@@ -1,14 +1,14 @@
 import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vitest/config';
+import { SvelteKitPWA } from '@vite-pwa/sveltekit';
 
-import { VitePWA } from 'vite-plugin-pwa';
-
-export default defineConfig({
+/** @type {import('vite').UserConfig} */
+const config = {
 	plugins: [
-		sveltekit(),
-		VitePWA({
-			injectRegister: 'inline',
+		SvelteKitPWA({
+			injectRegister: 'auto',
 			registerType: 'autoUpdate',
+			outDir: './build',
+			srcDir: './build',
 			workbox: {
 				globPatterns: ['**/*.{js,css,html,ico,png,svg,mp3}']
 			},
@@ -22,7 +22,8 @@ export default defineConfig({
 					{
 						src: '192.png',
 						sizes: '192x192',
-						type: 'image/png'
+						type: 'image/png',
+						purpose: 'any'
 					},
 					{
 						src: '512.png',
@@ -43,9 +44,12 @@ export default defineConfig({
 					}
 				]
 			}
-		})
+		}),
+		sveltekit()
 	],
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}']
 	}
-});
+};
+
+export default config;
